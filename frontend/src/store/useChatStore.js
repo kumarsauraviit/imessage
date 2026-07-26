@@ -15,6 +15,7 @@ export const useChatStore = create(
       isConversationsLoading: false,
       isUsersLoading: false,
       isMessagesLoading: false,
+      isMessageSending:false,
       activeConversationId: null,
       searchQuery: "",
       sidebarTab: "chats",
@@ -71,7 +72,8 @@ export const useChatStore = create(
       sendMessage: async (messageData) => {
         const { selectedUser, messages } = get();
         if (!selectedUser) return false;
-
+        if(isMessageSending) return ;
+        set({isMessageSending:true});
         try {
           const res = await axiosInstance.post(
             `/messages/send/${selectedUser._id}`,
@@ -85,6 +87,8 @@ export const useChatStore = create(
             error.response?.data?.message || "Failed to send message",
           );
           return false;
+        } finally {
+          set({ isMessageSending: false });
         }
       },
       
@@ -97,11 +101,12 @@ export const useChatStore = create(
         socket.off("newMessage");
         socket.on("newMessage", (newMessage) => {
           // if im not the receiver don't do anything just return
+          get().getConversations();
           if (String(newMessage.senderId) !== String(userId)) return;
 
           set({ messages: [...get().messages, newMessage] });
 
-          get().getConversations();
+         
         });
       },
 
