@@ -15,7 +15,7 @@ export const useChatStore = create(
       isConversationsLoading: false,
       isUsersLoading: false,
       isMessagesLoading: false,
-      isMessageSending:false,
+      isMessageSending: false,
       activeConversationId: null,
       searchQuery: "",
       sidebarTab: "chats",
@@ -68,12 +68,13 @@ export const useChatStore = create(
           set({ isMessagesLoading: false });
         }
       },
-// Purpose: Send a new message (text and/or image/video) to another user, save it, and push it to them in real time if they're online.
+      // Purpose: Send a new message (text and/or image/video) to another user, save it, and push it to them in real time if they're online.
       sendMessage: async (messageData) => {
-        const { selectedUser, messages } = get();
+        const { selectedUser, messages, isMessageSending } = get(); // ✅ pull it from state
         if (!selectedUser) return false;
-        if(isMessageSending) return ;
-        set({isMessageSending:true});
+        if (isMessageSending) return false; // ✅ also return false, not undefined
+
+        set({ isMessageSending: true });
         try {
           const res = await axiosInstance.post(
             `/messages/send/${selectedUser._id}`,
@@ -91,7 +92,6 @@ export const useChatStore = create(
           set({ isMessageSending: false });
         }
       },
-      
       subscribeToMessages: (userId) => {
         if (!userId) return;
 
@@ -105,8 +105,6 @@ export const useChatStore = create(
           if (String(newMessage.senderId) !== String(userId)) return;
 
           set({ messages: [...get().messages, newMessage] });
-
-         
         });
       },
 
