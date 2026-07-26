@@ -30,7 +30,7 @@ function App() {
 
   if (!isLoaded || (isSignedIn && isCheckingAuth)) return <PageLoader />;
 
-  return (
+  return (  
     <ThemeProvider>
       <WallpaperProvider>
         <Routes>

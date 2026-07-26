@@ -7,7 +7,7 @@ const BASE_URL = import.meta.env.MODE === "development" ? "http://localhost:3000
 export const useAuthStore = create((set, get) => ({
   authUser: null,
   isCheckingAuth: true,
-  onlineUsers: [],
+  onlineUsers: [],// we will save this after the user create ac socket.
   socket: null,
 
   checkAuth: async () => {
@@ -35,12 +35,15 @@ export const useAuthStore = create((set, get) => ({
     if (!user || get().socket?.connected) return;
 
     const socket = io(BASE_URL, { query: { userId: user._id } });
+    // creating a new socket for the user
 
     set({ socket });
 
     socket.on("getOnlineUsers", (userIds) => {
       set({ onlineUsers: userIds });
     });
+
+    // this is the query which we are sending to the back
   },
 
   disconnectSocket: () => {

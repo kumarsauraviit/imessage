@@ -25,7 +25,7 @@ function mapUserForList(user, onlineUsers) {
   };
 }
 
-function ChatSidebar() {
+function Chat Sidebar(){
   const conversations = useChatStore((state) => state.conversations);
 
   console.log(conversations);

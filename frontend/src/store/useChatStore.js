@@ -21,7 +21,7 @@ export const useChatStore = create(
       composerText: "",
       isSoundEnabled: true,
       isSendingMedia: false,
-
+      // this give us all the user from the database who is register with clerk.
       getUsers: async () => {
         set({ isUsersLoading: true });
         try {
@@ -29,7 +29,8 @@ export const useChatStore = create(
           set((state) => ({
             users: res.data,
             selectedUser:
-              state.selectedUser && res.data.some((user) => user._id === state.selectedUser._id)
+              state.selectedUser &&
+              res.data.some((user) => user._id === state.selectedUser._id)
                 ? state.selectedUser
                 : null,
           }));
@@ -39,7 +40,7 @@ export const useChatStore = create(
           set({ isUsersLoading: false });
         }
       },
-
+      // Purpose: Get only the users you've actually messaged with before, sorted by most recent conversation — like a WhatsApp/Messenger chat list
       getConversations: async () => {
         set({ isConversationsLoading: true });
         try {
@@ -51,7 +52,7 @@ export const useChatStore = create(
           set({ isConversationsLoading: false });
         }
       },
-
+      // Purpose: Get the full message history between the logged-in user and one specific other user (i.e., open a chat and load its messages).
       getMessages: async (userId) => {
         if (!userId) return;
         set({ isMessagesLoading: true });
@@ -59,27 +60,34 @@ export const useChatStore = create(
           const res = await axiosInstance.get(`/messages/${userId}`);
           set({ messages: res.data });
         } catch (error) {
-          toast.error(error.response?.data?.message || "Failed to load messages");
+          toast.error(
+            error.response?.data?.message || "Failed to load messages",
+          );
         } finally {
           set({ isMessagesLoading: false });
         }
       },
-
+// Purpose: Send a new message (text and/or image/video) to another user, save it, and push it to them in real time if they're online.
       sendMessage: async (messageData) => {
         const { selectedUser, messages } = get();
         if (!selectedUser) return false;
 
         try {
-          const res = await axiosInstance.post(`/messages/send/${selectedUser._id}`, messageData);
+          const res = await axiosInstance.post(
+            `/messages/send/${selectedUser._id}`,
+            messageData,
+          );
           set({ messages: [...messages, res.data], composerText: "" });
           get().getConversations();
           return true;
         } catch (error) {
-          toast.error(error.response?.data?.message || "Failed to send message");
+          toast.error(
+            error.response?.data?.message || "Failed to send message",
+          );
           return false;
         }
       },
-
+      
       subscribeToMessages: (userId) => {
         if (!userId) return;
 
@@ -109,7 +117,9 @@ export const useChatStore = create(
           activeConversationId,
           selectedUser:
             state.users.find((user) => user._id === activeConversationId) ||
-            state.conversations.find((user) => user._id === activeConversationId) ||
+            state.conversations.find(
+              (user) => user._id === activeConversationId,
+            ) ||
             null,
           messages: activeConversationId ? state.messages : [],
         }));

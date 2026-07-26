@@ -16,7 +16,7 @@ export async function getUsersForSidebar(req, res) {
   }
 }
 
-export async function getConversationsForSidebar(req, res) {
+export async function getConversationsForSidebar(req, res){
   try {
     const loggedInUserId = req.user._id;
 
@@ -73,7 +73,7 @@ export async function sendMessage(req, res) {
     const { id: receiverId } = req.params;
     const senderId = req.user._id;
 
-    let imageUrl;
+    let imageUrl; 
     let videoUrl;
 
     if (req.file) {
